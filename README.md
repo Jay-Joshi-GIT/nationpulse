@@ -56,4 +56,19 @@ The results of every step are already in this repository, so you can open the da
 
 The data comes from the World Bank World Development Indicators (CC BY 4.0) and the IMF World Economic Outlook. These and their original sources (IMF, ILO, UN, UNESCO, OECD) keep their own terms; some data may not be reused commercially without permission. See [CREDITS.md](CREDITS.md) for every data source, model, library and method, with licences and citations.
 
-No data provider endorses this project. The code was written with the help of Claude Code (Anthropic).
+No data provider endorses this project.
+
+## Reproducibility notes
+
+- **Data access.** `data_pipeline.py` downloads everything from the public World Bank and IMF web APIs; no key or login is needed. The data used in the paper (downloaded 20 October 2026) is included as `economic_data.csv`.
+- **Splits.** XGBoost and the baselines are scored leave-one-country-out: each country is predicted by a model trained on the other 51 countries. The conformal 95% range uses a 70/30 split by country. All splits use `random_state=42`.
+- **Models.** XGBoost with 200 trees, depth 3 and learning rate 0.05, fixed in advance (no tuning). The LLM is `mistral` (Mistral 7B Instruct) through Ollama 0.40.6, at temperature 0 with JSON output. Even at temperature 0 its answers can vary slightly between runs.
+- **Results.** Every output of the paper is in `results/`, including the plots not shown in the paper.
+
+## AI-use disclosure
+
+- Claude Code by Anthropic was used to write and debug the code, run the pipeline and draft the report.
+- Decisions made without AI: the choice of XGBoost and SHAP as System 1, all data decisions (including using IMF data for government debt), and the idea of comparing environmental cost.
+- The project began as the strategy planner; the other comparisons in the dashboard were added while working with the AI.
+- Checked by hand: all AI-generated code, for doing what it should; the dashboard and strategy planner outputs for different countries; and the web page layout.
+- Mistral 7B is the system being studied, not a writing aid.
