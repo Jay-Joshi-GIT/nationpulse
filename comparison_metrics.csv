@@ -1,0 +1,22 @@
+test,measure,xgboost_shap,llm,better,note
+accuracy,mean_abs_error_points,9.1,17.8,XGBoost + SHAP,
+baseline_average_score,mean_abs_error_points,,,no winner,21.8 points; Spearman r nan
+baseline_linear_regression,mean_abs_error_points,,,no winner,13.3 points; Spearman r 0.842
+ranking,spearman_r_with_real_score,0.871,0.63,XGBoost + SHAP,
+income_fairness,High income,-4.2,-19.9,no winner,
+income_fairness,Low income,8.4,33.6,no winner,
+income_fairness,Lower middle income,1.0,20.7,no winner,
+income_fairness,Upper middle income,-0.3,2.3,no winner,
+income_fairness,worst_group_abs_error,8.4,33.6,XGBoost + SHAP,
+region_fairness,East Asia & Pacific,-3.0,3.8,no winner,
+region_fairness,Europe & Central Asia,-4.1,-15.2,no winner,
+region_fairness,Latin America & Caribbean,3.5,-2.0,no winner,
+region_fairness,"Middle East, North Africa, Afghanistan & Pakistan",4.2,4.4,no winner,
+region_fairness,North America,-14.6,-28.6,no winner,
+region_fairness,South Asia,14.1,18.9,no winner,
+region_fairness,Sub-Saharan Africa,-2.4,24.5,no winner,
+region_fairness,worst_group_abs_error,14.6,28.6,XGBoost + SHAP,
+consistency,mean_abs_change_points,0.0,13.8,XGBoost + SHAP,XGBoost always gives the same output for the same input
+framing,mean_abs_change_points,,8.4,no winner,"XGBoost only reads numbers, so it cannot be tested with sentences"
+coverage,share_scored,1.0,1.0,tie,
+explanation_agreement,mean_spearman_r_shap_vs_llm,-0.194,-0.194,no winner,One shared number: how much the two explanations agree

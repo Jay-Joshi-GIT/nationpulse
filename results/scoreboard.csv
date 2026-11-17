@@ -1,0 +1,17 @@
+area,measure,xgboost_shap,llm,better,note
+Scoring,Accuracy: points from the real score,9.1,17.8,XGBoost + SHAP,
+Scoring,Ranking: Spearman r with the real score,0.871,0.63,XGBoost + SHAP,
+Scoring,"Fairness: worst income group, average error",8.4,33.6,XGBoost + SHAP,
+Scoring,"Fairness: worst region, average error",14.6,28.6,XGBoost + SHAP,
+Scoring,Consistency: change when asked again,0.0,13.8,XGBoost + SHAP,XGBoost always gives the same output for the same input
+Scoring,Framing: change when numbers become sentences,,8.4,no winner,"XGBoost only reads numbers, so it cannot be tested with sentences"
+Scoring,Coverage: share of countries scored,1.0,1.0,tie,
+Scoring,Explanations: agreement between SHAP and LLM,-0.194,-0.194,no winner,One shared number: how much the two explanations agree
+Scoring,Uncertainty: gives a 95% range for its score,"yes, +/- 22.9 points, holds the real score for 100% of unseen countries",no,XGBoost + SHAP,Only XGBoost can state how sure it is
+Strategy,Realism: share of changes at a pace countries have achieved,100.0,65.3,XGBoost + SHAP,"XGBoost searches only within these limits, so it is 100 by design"
+Strategy,Direction: share of changes economics recommends (model's own choice),73.9,100.0,LLM,"With the economics rule added, XGBoost is 100 by design"
+Strategy,Plans with a move against economics (countries),30,0,LLM,Out of 51 countries; XGBoost without the economics rule
+Strategy,Coverage: share of countries with a usable plan,1.0,1.0,tie,
+Strategy,Average number of indicators changed,2.0,6.9,no winner,"Fewer changes is simpler, more changes is broader: no winner"
+Strategy,Explanation of the plan,"SHAP score gain per indicator, adds up exactly to the total",priority and a short reason per indicator,no winner,Different kinds of explanation; neither can be checked against a true answer
+Environment,"Environmental cost: scoring + strategy plans, 52 countries (estimated)","4.1 s, 0.017 Wh, 0.0123 g CO2, 0.0594 ml water","163 min, 40.8 Wh, 29.7 g CO2, 143 ml water",XGBoost + SHAP,"estimate: run time x 15 W CPU rating; the LLM uses about 2,404 times the energy (34-68 Wh at 12.5-25 W)"

@@ -1,0 +1,16 @@
+# Python packages NationPulse imports directly (pip installs what they need).
+# Install with:  pip install -r requirements.txt
+# The LLM itself also needs Ollama (ollama.com) and:  ollama pull mistral
+
+pandas==3.0.6           # tables of data
+numpy==2.5.4            # numbers and arrays
+requests==2.34.2        # downloading World Bank and IMF data
+xgboost==3.4.1          # System 1: the XGBoost model
+shap==0.54.1            # System 1: SHAP explanations
+scikit-learn==1.9.1     # train/test splits and error measures
+scipy==1.18.1           # Spearman correlation
+matplotlib==3.11.2      # charts saved as pictures
+seaborn==0.13.2         # the attribution heatmap
+ollama==0.6.3           # System 2: talking to the local Mistral model
+gradio==6.30.0          # the dashboard
+plotly==7.1.0           # charts in the dashboard
