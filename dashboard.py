@@ -192,54 +192,60 @@ data_credit = ('Data: World Bank, World Development Indicators (CC BY 4.0), with
                '(Mistral AI, Apache 2.0) run with Ollama. No data provider endorses this project. '
                'Full credits and licences: CREDITS.md')
 
-strategy_tab = gr.Interface(
-    fn=plan_strategies,
-    inputs=[
-        gr.Dropdown(choices=country_names, value='India', label='Country'),
-        gr.Slider(0, 100, value=45, step=1, label='Target score'),
-        gr.Slider(1, 10, value=5, step=1, label='Years to reach it')
-    ],
-    outputs=[
-        gr.Markdown(),
-        gr.Dataframe(label='System 1: XGBoost + SHAP plan (moves only the way economics recommends)', wrap=True),
-        gr.Dataframe(label="System 1: the model's own choice (no economics rule)", wrap=True),
-        gr.Dataframe(label='System 2: LLM plan', wrap=True),
-        gr.Dataframe(label='The same checks for every plan', wrap=True),
-        gr.Plot(label='Size of each change')
-    ],
-    submit_btn='Make plans',
-    article=data_credit,
-    title='NationPulse strategy planner',
-    description='Pick a country, a target score and a number of years. Both systems '
-                'propose how to get there, and every plan gets the same checks. Takes a few minutes.'
-)
+# ----- Page layouts -----
+# Each page puts its inputs and buttons in one row at the top, so the tables
+# and charts below can use the full width of the page.
+
+with gr.Blocks() as results_tab:
+    gr.Markdown('## NationPulse\nTwo systems compete to score countries: an explainable XGBoost '
+                'model and an LLM. Both are compared with the real World Bank score.')
+    with gr.Row(equal_height=True):
+        country = gr.Dropdown(choices=country_names, value=country_names[0], label='Country', scale=3)
+        clear_button = gr.ClearButton(scale=1)
+        show_button = gr.Button('Show results', variant='primary', scale=1)
+    with gr.Row():
+        real_box = gr.Textbox(label='Real score (World Bank data)')
+        xgb_box = gr.Textbox(label='System 1: XGBoost + SHAP (trained without this country)')
+        llm_box = gr.Textbox(label='System 2: LLM')
+    tests_table = gr.Dataframe(label='Both systems on each test', wrap=True)
+    importance_plot = gr.Plot(label='Indicator importance')
+    gr.Markdown(data_credit)
+
+    results_outputs = [real_box, xgb_box, llm_box, tests_table, importance_plot]
+    show_button.click(show_country, inputs=country, outputs=results_outputs)
+    clear_button.add(results_outputs)
 
 
-results_tab = gr.Interface(
-    fn=show_country,
-    inputs=gr.Dropdown(choices=country_names, value=country_names[0], label='Country'),
-    outputs=[
-        gr.Textbox(label='Real score (World Bank data)'),
-        gr.Textbox(label='System 1: XGBoost + SHAP (trained without this country)'),
-        gr.Textbox(label='System 2: LLM'),
-        gr.Dataframe(label='Both systems on each test', wrap=True),
-        gr.Plot(label='Indicator importance')
-    ],
-    submit_btn='Show results',
-    article=data_credit,
-    title='NationPulse',
-    description='Two systems compete to score countries: an explainable XGBoost model '
-                'and an LLM. Both are compared with the real World Bank score.'
-)
+with gr.Blocks() as strategy_tab:
+    gr.Markdown('## NationPulse strategy planner\nPick a country, a target score and a number of '
+                'years. Both systems propose how to get there, and every plan gets the same checks. '
+                'Takes a few minutes.')
+    with gr.Row(equal_height=True):
+        plan_country = gr.Dropdown(choices=country_names, value='India', label='Country', scale=2)
+        target = gr.Slider(0, 100, value=45, step=1, label='Target score', scale=2)
+        years = gr.Slider(1, 10, value=5, step=1, label='Years to reach it', scale=2)
+        plan_clear_button = gr.ClearButton(scale=1)
+        plan_button = gr.Button('Make plans', variant='primary', scale=1)
+    summary = gr.Markdown()
+    checks_table = gr.Dataframe(label='The same checks for every plan', wrap=True)
+    change_plot = gr.Plot(label='Size of each change')
+    xgb_table = gr.Dataframe(label='System 1: XGBoost + SHAP plan (moves only the way economics recommends)', wrap=True)
+    free_table = gr.Dataframe(label="System 1: the model's own choice (no economics rule)", wrap=True)
+    llm_table = gr.Dataframe(label='System 2: LLM plan', wrap=True)
+    gr.Markdown(data_credit)
 
-scoreboard_tab = gr.Interface(
-    fn=lambda: scoreboard[['area', 'measure', 'xgboost_shap', 'llm', 'better', 'note']],
-    inputs=[],
-    outputs=gr.Dataframe(label='Which system does better at what?', wrap=True),
-    article=data_credit,
-    title='Scoreboard',
-    description='All results in one table. Press Generate to show it.'
-)
+    # plan_strategies returns: summary, XGBoost plan, own-choice plan, LLM plan, checks, chart
+    plan_outputs = [summary, xgb_table, free_table, llm_table, checks_table, change_plot]
+    plan_button.click(plan_strategies, inputs=[plan_country, target, years], outputs=plan_outputs)
+    plan_clear_button.add(plan_outputs)
+
+
+with gr.Blocks() as scoreboard_tab:
+    gr.Markdown('## Scoreboard\nAll results in one table: which system does better at what.')
+    gr.Dataframe(value=scoreboard[['area', 'measure', 'xgboost_shap', 'llm', 'better', 'note']],
+                 label='Which system does better at what?', wrap=True)
+    gr.Markdown(data_credit)
+
 
 # ----- Hover text for every button -----
 # Gradio buttons have no tooltip setting, so this small script, added to the
@@ -252,10 +258,8 @@ button_help = {
     'Scoreboard': 'Which system does better at what, over all tests',
     'Show results': 'Show both systems\' scores and tests for the chosen country',
     'Make plans': 'Ask both systems for a plan for this country, target and number of years (takes a few minutes)',
-    'Generate': 'Show the table of which system does better at what',
     '↺': 'Put this slider back to its starting value',
-    'Clear': 'Reset the inputs and empty the results',
-    'Flag': 'Save these inputs and results to the .gradio/flagged folder, e.g. to note a strange result',
+    'Clear': 'Empty the results on this page',
     'Use via API': 'How to call this dashboard from your own code instead of the web page',
     'Settings': 'Change the page\'s language, light or dark theme, and zoom',
     'Stop Recording': 'Stop recording your clicks as API code',
